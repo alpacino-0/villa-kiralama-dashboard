@@ -11,18 +11,19 @@ import {
   IconFileWord,
   IconFolder,
   IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
+  IconHome,
   IconReport,
   IconSearch,
   IconSettings,
-  IconUsers,
+  IconMap,
+  IconTags,
 } from "@tabler/icons-react"
+import Image from "next/image"
 
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+import { NavDocuments } from "@/app/(dashboard)/_components/nav-documents"
+import { NavMain } from "@/app/(dashboard)/_components/nav-main"
+import { NavSecondary } from "@/app/(dashboard)/_components/nav-secondary"
+import { NavUser } from "@/app/(dashboard)/_components/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -32,83 +33,89 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link"
 
 const data = {
   user: {
     name: "shadcn",
     email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    avatar: "/avatars/shadcn.jpg" ,
   },
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
+      title: "Gösterge Paneli",
+      url: "/admin",
       icon: IconDashboard,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
+      title: "Villa Yönetimi",
+      url: "/admin/villas",
+      icon: IconHome,
     },
     {
-      title: "Analytics",
-      url: "#",
+      title: "Fiyat Yönetimi",
+      url: "/admin/SeasonalPrice",
       icon: IconChartBar,
     },
     {
-      title: "Projects",
+      title: "Projeler",
       url: "#",
       icon: IconFolder,
     },
     {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
+      title: "Etiket Yönetimi",
+      url: "/admin/tags",
+      icon: IconTags,
+    },
+    {
+      title: "Bölge Yönetimi",
+      url: "/admin/regions",
+      icon: IconMap,
     },
   ],
   navClouds: [
     {
-      title: "Capture",
+      title: "Yakala",
       icon: IconCamera,
       isActive: true,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Aktif Teklifler",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Arşivlenmiş",
           url: "#",
         },
       ],
     },
     {
-      title: "Proposal",
+      title: "Teklif",
       icon: IconFileDescription,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Aktif Teklifler",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Arşivlenmiş",
           url: "#",
         },
       ],
     },
     {
-      title: "Prompts",
+      title: "İstemler",
       icon: IconFileAi,
       url: "#",
       items: [
         {
-          title: "Active Proposals",
+          title: "Aktif Teklifler",
           url: "#",
         },
         {
-          title: "Archived",
+          title: "Arşivlenmiş",
           url: "#",
         },
       ],
@@ -116,34 +123,34 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Settings",
+      title: "Ayarlar",
       url: "#",
       icon: IconSettings,
     },
     {
-      title: "Get Help",
+      title: "Yardım Al",
       url: "#",
       icon: IconHelp,
     },
     {
-      title: "Search",
+      title: "Arama",
       url: "#",
       icon: IconSearch,
     },
   ],
   documents: [
     {
-      name: "Data Library",
+      name: "Veri Kütüphanesi",
       url: "#",
       icon: IconDatabase,
     },
     {
-      name: "Reports",
+      name: "Raporlar",
       url: "#",
       icon: IconReport,
     },
     {
-      name: "Word Assistant",
+      name: "Kelime Asistanı",
       url: "#",
       icon: IconFileWord,
     },
@@ -160,10 +167,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
-              </a>
+              <Link href="/">
+                <Image 
+                  src="/icon.svg" 
+                  alt="Inn Elegance Logo" 
+                  width={20} 
+                  height={20} 
+                  className="size-5"
+                />
+                <span className="text-base font-semibold">Inn Elegance</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
