@@ -3,13 +3,6 @@
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -47,58 +40,97 @@ export function ForgotPasswordForm({
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       {success ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+        // Başarı Durumu
+        <div className="text-center space-y-4">
+          {/* Başarı İkonu */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center">
+              <svg 
+                className="w-8 h-8 text-green-600 dark:text-green-400" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M5 13l4 4L19 7" 
+                />
+              </svg>
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-green-700 dark:text-green-400">
+              E-posta Gönderildi
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Şifre sıfırlama talimatları e-posta adresinize gönderildi. 
+              E-posta kutunuzu kontrol edin ve spam klasörünü de kontrol etmeyi unutmayın.
             </p>
-          </CardContent>
-        </Card>
+          </div>
+          
+          <div className="pt-4">
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/auth/login">
+                Giriş Sayfasına Dön
+              </Link>
+            </Button>
+          </div>
+        </div>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleForgotPassword}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+        // Form Durumu
+        <form onSubmit={handleForgotPassword}>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="email">E-posta Adresi</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder=""
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-white/50"
+              />
+              <p className="text-xs text-muted-foreground">
+                Kayıtlı e-posta adresinizi girin, size şifre sıfırlama bağlantısı göndereceğiz.
+              </p>
+            </div>
+            
+            {error && (
+              <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20">
+                <p className="text-sm text-destructive font-medium">{error}</p>
+              </div>
+            )}
+            
+            <Button 
+              type="submit" 
+              className="w-full h-11 font-medium" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Gönderiliyor...
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
-                </Button>
-              </div>
-              <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              ) : (
+                "Şifre Sıfırlama E-postası Gönder"
+              )}
+            </Button>
+            
+            <div className="text-center text-sm border-t border-border/50 pt-4">
+              <span className="text-muted-foreground">Hesabınızı hatırladınız mı? </span>
+              <Link
+                href="/auth/login"
+                className="text-primary hover:text-primary/80 underline underline-offset-2 transition-colors font-medium"
+              >
+                Giriş Yap
+              </Link>
+            </div>
+          </div>
+        </form>
       )}
     </div>
   );
