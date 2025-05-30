@@ -345,13 +345,91 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      },
+      Reservation: {
+        Row: {
+          id: string
+          bookingRef: string
+          villaId: string
+          startDate: string
+          endDate: string
+          guestCount: number
+          totalAmount: number
+          advanceAmount: number
+          remainingAmount: number
+          paymentType: Database["public"]["Enums"]["PaymentType"]
+          status: Database["public"]["Enums"]["ReservationStatus"]
+          paymentMethod: string
+          customerName: string
+          customerEmail: string
+          customerPhone: string
+          customerNotes: string | null
+          cancellationReason: string | null
+          cancelledAt: string | null
+          createdAt: string | null
+          updatedAt: string | null
+        }
+        Insert: {
+          id?: string
+          bookingRef: string
+          villaId: string
+          startDate: string
+          endDate: string
+          guestCount: number
+          totalAmount: number
+          advanceAmount: number
+          remainingAmount: number
+          paymentType?: Database["public"]["Enums"]["PaymentType"]
+          status?: Database["public"]["Enums"]["ReservationStatus"]
+          paymentMethod?: string
+          customerName: string
+          customerEmail: string
+          customerPhone: string
+          customerNotes?: string | null
+          cancellationReason?: string | null
+          cancelledAt?: string | null
+          createdAt?: string | null
+          updatedAt?: string | null
+        }
+        Update: {
+          id?: string
+          bookingRef?: string
+          villaId?: string
+          startDate?: string
+          endDate?: string
+          guestCount?: number
+          totalAmount?: number
+          advanceAmount?: number
+          remainingAmount?: number
+          paymentType?: Database["public"]["Enums"]["PaymentType"]
+          status?: Database["public"]["Enums"]["ReservationStatus"]
+          paymentMethod?: string
+          customerName?: string
+          customerEmail?: string
+          customerPhone?: string
+          customerNotes?: string | null
+          cancellationReason?: string | null
+          cancelledAt?: string | null
+          createdAt?: string | null
+          updatedAt?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_reservation_villa"
+            columns: ["villaId"]
+            referencedRelation: "Villa"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       // Diğer tablolarınızı buraya ekleyebilirsiniz
     },
     Enums: {
       VillaStatus: "ACTIVE" | "INACTIVE",
       CalendarStatus: "AVAILABLE" | "PENDING" | "RESERVED" | "BLOCKED",
-      EventType: "CHECKIN" | "CHECKOUT" | "SPECIAL_OFFER"
+      EventType: "CHECKIN" | "CHECKOUT" | "SPECIAL_OFFER",
+      PaymentType: "FULL_PAYMENT" | "SPLIT_PAYMENT",
+      ReservationStatus: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED"
     }
   }
 } 

@@ -22,6 +22,7 @@ function getPageTitle(pathname: string | null): string {
     'profile': 'Profil Yönetimi',
     'tags': 'Etiket Yönetimi',
     'villas': 'Villa Yönetimi',
+    'reservations': 'Rezervasyon Yönetimi',
     'add' : 'Villa Ekle',
 
     // Diğer sayfalarınızı buraya ekleyin

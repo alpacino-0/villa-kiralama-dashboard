@@ -49,8 +49,8 @@ const data = {
       icon: IconHome,
     },
     {
-      title: "Fiyat Yönetimi",
-      url: "/admin/SeasonalPrice",
+      title: "Rezervasyon Yönetimi",
+      url: "/admin/reservations",
       icon: IconChartBar,
     },
     {
