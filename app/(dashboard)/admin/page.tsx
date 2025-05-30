@@ -1,10 +1,19 @@
 import { ChartAreaInteractive } from "@/app/(dashboard)/_components/chart-area-interactive"
 import { DataTable } from "@/app/(dashboard)/_components/data-table"
 import { SectionCards } from "@/app/(dashboard)/_components/section-cards"
+import { isCurrentUserAdmin } from "@/lib/supabase/profiles"
+import { redirect } from "next/navigation"
 
 import data from "./data.json"
 
-export default function Page() {
+export default async function Page() {
+  // Server-side admin kontrolü
+  const isAdmin = await isCurrentUserAdmin()
+  
+  if (!isAdmin) {
+    redirect('/unauthorized')
+  }
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">

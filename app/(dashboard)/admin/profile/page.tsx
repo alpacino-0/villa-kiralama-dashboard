@@ -1,5 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select'
+
+interface Profile {
+  id: string
+  email: string
+  full_name: string | null
+  phone_number: string | null
+  role: string
+  created_at: string | null
+}
 
 export default async function Page() {
   const supabase = await createClient()
@@ -39,96 +61,188 @@ export default async function Page() {
     
     revalidatePath('/admin/profile')
   }
-  
+
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case 'ADMIN':
+        return 'destructive'
+      case 'CUSTOMER':
+        return 'secondary'
+      default:
+        return 'outline'
+    }
+  }
+
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'ADMIN':
+        return 'Yönetici'
+      case 'CUSTOMER':
+        return 'Müşteri'
+      default:
+        return role
+    }
+  }
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Profil Listesi</h1>
-      <div className="space-y-8">
-        {profiles?.map((profile) => (
-          <div key={profile.id} className="border p-6 rounded-lg shadow-sm">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h2 className="text-xl font-semibold mb-2">{profile.full_name || 'İsimsiz Kullanıcı'}</h2>
-                <div className="inline-block px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm mb-3">
-                  {profile.role === 'CUSTOMER' ? 'Müşteri' : profile.role}
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Profil Yönetimi
+        </h1>
+        <p className="text-muted-foreground mt-2">
+          Kullanıcı profillerini görüntüleyin ve düzenleyin
+        </p>
+      </div>
+      
+      <div className="grid gap-6">
+        {profiles?.map((profile: Profile) => (
+          <Card key={profile.id} className="w-full">
+            <CardHeader className="pb-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-2">
+                  <CardTitle className="text-xl">
+                    {profile.full_name || 'İsimsiz Kullanıcı'}
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    <span>{profile.email}</span>
+                    <Badge variant={getRoleBadgeVariant(profile.role)}>
+                      {getRoleDisplayName(profile.role)}
+                    </Badge>
+                  </CardDescription>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Üyelik: {profile.created_at ? new Date(profile.created_at).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
                 </div>
               </div>
-            </div>
-            
-            <div className="mt-6 border-t pt-4">
-              <h3 className="font-semibold mb-4">Profili Düzenle</h3>
-              <form action={updateProfile} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="hidden" name="userId" value={profile.id} />
-                
-                <div className="space-y-1">
-                  <label htmlFor={`email-${profile.id}`} className="block text-sm font-medium text-gray-700">E-posta</label>
-                  <input 
-                    id={`email-${profile.id}`}
-                    type="email" 
-                    name="email" 
-                    defaultValue={profile.email}
-                    className="w-full p-2 border rounded-md"
-                    required
-                  />
+            </CardHeader>
+
+            <Separator />
+
+            <CardContent className="pt-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Kullanıcı Bilgileri */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Kullanıcı Bilgileri</h3>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <span className="font-medium text-muted-foreground">ID:</span>
+                      <span className="col-span-2 font-mono text-xs break-all">
+                        {profile.id}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <span className="font-medium text-muted-foreground">E-posta:</span>
+                      <span className="col-span-2">{profile.email}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <span className="font-medium text-muted-foreground">Telefon:</span>
+                      <span className="col-span-2">
+                        {profile.phone_number || 'Belirtilmemiş'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-sm">
+                      <span className="font-medium text-muted-foreground">Rol:</span>
+                      <span className="col-span-2">
+                        <Badge variant={getRoleBadgeVariant(profile.role)} className="text-xs">
+                          {getRoleDisplayName(profile.role)}
+                        </Badge>
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="space-y-1">
-                  <label htmlFor={`fullName-${profile.id}`} className="block text-sm font-medium text-gray-700">Ad Soyad</label>
-                  <input 
-                    id={`fullName-${profile.id}`}
-                    type="text" 
-                    name="fullName" 
-                    defaultValue={profile.full_name || ''}
-                    className="w-full p-2 border rounded-md"
-                  />
+
+                {/* Profil Düzenleme Formu */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Profili Düzenle</h3>
+                  <form action={updateProfile} className="space-y-4">
+                    <input type="hidden" name="userId" value={profile.id} />
+                    
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor={`email-${profile.id}`}>
+                          E-posta Adresi *
+                        </Label>
+                        <Input 
+                          id={`email-${profile.id}`}
+                          type="email" 
+                          name="email" 
+                          defaultValue={profile.email}
+                          required
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor={`fullName-${profile.id}`}>
+                          Ad Soyad
+                        </Label>
+                        <Input 
+                          id={`fullName-${profile.id}`}
+                          type="text" 
+                          name="fullName" 
+                          defaultValue={profile.full_name || ''}
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor={`phoneNumber-${profile.id}`}>
+                          Telefon Numarası
+                        </Label>
+                        <Input 
+                          id={`phoneNumber-${profile.id}`}
+                          type="tel" 
+                          name="phoneNumber" 
+                          defaultValue={profile.phone_number || ''}
+                          placeholder="0555 123 45 67"
+                          className="w-full"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor={`role-${profile.id}`}>
+                          Kullanıcı Rolü
+                        </Label>
+                        <Select name="role" defaultValue={profile.role}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Rol seçiniz" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="CUSTOMER">Müşteri</SelectItem>
+                            <SelectItem value="ADMIN">Yönetici</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end pt-4">
+                      <Button 
+                        type="submit"
+                        className="w-full sm:w-auto"
+                      >
+                        Profili Güncelle
+                      </Button>
+                    </div>
+                  </form>
                 </div>
-                
-                <div className="space-y-1">
-                  <label htmlFor={`phoneNumber-${profile.id}`} className="block text-sm font-medium text-gray-700">Telefon</label>
-                  <input 
-                    id={`phoneNumber-${profile.id}`}
-                    type="tel" 
-                    name="phoneNumber" 
-                    defaultValue={profile.phone_number || ''}
-                    className="w-full p-2 border rounded-md"
-                  />
-                </div>
-                
-                <div className="space-y-1">
-                  <label htmlFor={`role-${profile.id}`} className="block text-sm font-medium text-gray-700">Kullanıcı Rolü</label>
-                  <select 
-                    id={`role-${profile.id}`}
-                    name="role" 
-                    defaultValue={profile.role}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="CUSTOMER">Müşteri</option>
-                    <option value="ADMIN">Yönetici</option>
-                  </select>
-                </div>
-                
-                <div className="md:col-span-2 mt-2">
-                  <button 
-                    type="submit"
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-                  >
-                    Profili Güncelle
-                  </button>
-                </div>
-              </form>
-            </div>
-            
-            <div className="mt-4 pt-4 border-t">
-              <h3 className="font-semibold mb-2">Kullanıcı Bilgileri</h3>
-              <ul className="space-y-1">
-                <li><span className="font-medium">ID:</span> <span className="text-sm text-gray-600">{profile.id}</span></li>
-                <li><span className="font-medium">E-posta:</span> {profile.email}</li>
-                <li><span className="font-medium">Telefon:</span> {profile.phone_number || 'Belirtilmemiş'}</li>
-                <li><span className="font-medium">Oluşturma Tarihi:</span> {profile.created_at ? new Date(profile.created_at).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}</li>
-              </ul>
-            </div>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
+        
+        {(!profiles || profiles.length === 0) && (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold">Kullanıcı Bulunamadı</h3>
+                <p className="text-muted-foreground">
+                  Henüz hiç kullanıcı profili bulunmamaktadır.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   )

@@ -34,6 +34,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Admin rotaları kontrolü
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin');
+  
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&
@@ -44,6 +47,29 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
+  }
+
+  // Admin route kontrolü - kullanıcı giriş yapmış ama admin değilse
+  if (isAdminRoute && user) {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile || profile.role !== 'ADMIN') {
+        // Admin değilse anasayfaya yönlendir
+        const url = request.nextUrl.clone();
+        url.pathname = "/unauthorized";
+        return NextResponse.redirect(url);
+      }
+    } catch (error) {
+      console.error('Admin kontrolü hatası:', error);
+      const url = request.nextUrl.clone();
+      url.pathname = "/unauthorized";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

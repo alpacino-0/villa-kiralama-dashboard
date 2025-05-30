@@ -3,6 +3,7 @@
 import { AppSidebar } from "@/app/(dashboard)/_components/app-sidebar"
 import { SiteHeader } from "@/app/(dashboard)/_components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
+import { AdminGuard } from "@/components/admin-guard"
 import { usePathname } from "next/navigation"
 
 // Sayfa adı yardımcı fonksiyonu
@@ -39,7 +40,10 @@ export default function Layout({
   const pathname = usePathname();
   const pageTitle = getPageTitle(pathname);
   
-  return (
+  // Admin route kontrolü
+  const isAdminRoute = pathname?.startsWith('/admin');
+  
+  const content = (
     <div className="flex flex-col min-h-screen">
       <SidebarProvider
         style={
@@ -57,4 +61,16 @@ export default function Layout({
       </SidebarProvider>
     </div>
   );
+  
+  // Admin route ise AdminGuard ile sar
+  if (isAdminRoute) {
+    return (
+      <AdminGuard>
+        {content}
+      </AdminGuard>
+    );
+  }
+  
+  // Normal route
+  return content;
 }
