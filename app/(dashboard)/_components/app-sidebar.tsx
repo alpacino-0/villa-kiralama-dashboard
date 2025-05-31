@@ -9,7 +9,6 @@ import {
   IconFileAi,
   IconFileDescription,
   IconFileWord,
-  IconFolder,
   IconHelp,
   IconHome,
   IconReport,
@@ -17,6 +16,7 @@ import {
   IconSettings,
   IconMap,
   IconTags,
+  IconSeo,
 } from "@tabler/icons-react"
 import Image from "next/image"
 
@@ -54,9 +54,9 @@ const data = {
       icon: IconChartBar,
     },
     {
-      title: "Projeler",
-      url: "#",
-      icon: IconFolder,
+      title: "Villa SEO",
+      url: "/admin/villaSEO",
+      icon: IconSeo,
     },
     {
       title: "Etiket Yönetimi",

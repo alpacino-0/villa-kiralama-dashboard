@@ -421,6 +421,55 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      },
+      VillaSEO: {
+        Row: {
+          id: string
+          villaId: string
+          metaTitle: string | null
+          metaDescription: string | null
+          metaKeywords: string | null
+          ogTitle: string | null
+          ogDescription: string | null
+          ogImage: string | null
+          noIndex: boolean
+          createdAt: string
+          updatedAt: string
+        }
+        Insert: {
+          id?: string
+          villaId: string
+          metaTitle?: string | null
+          metaDescription?: string | null
+          metaKeywords?: string | null
+          ogTitle?: string | null
+          ogDescription?: string | null
+          ogImage?: string | null
+          noIndex?: boolean
+          createdAt?: string
+          updatedAt?: string
+        }
+        Update: {
+          id?: string
+          villaId?: string
+          metaTitle?: string | null
+          metaDescription?: string | null
+          metaKeywords?: string | null
+          ogTitle?: string | null
+          ogDescription?: string | null
+          ogImage?: string | null
+          noIndex?: boolean
+          createdAt?: string
+          updatedAt?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "VillaSEO_villaId_fkey"
+            columns: ["villaId"]
+            referencedRelation: "Villa"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       // Diğer tablolarınızı buraya ekleyebilirsiniz
     },

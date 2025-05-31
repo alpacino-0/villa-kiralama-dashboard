@@ -6,6 +6,9 @@ import { redirect } from "next/navigation"
 
 import data from "./data.json"
 
+// Admin sayfası cookies kullandığından dynamic rendering zorla
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   // Server-side admin kontrolü
   const isAdmin = await isCurrentUserAdmin()

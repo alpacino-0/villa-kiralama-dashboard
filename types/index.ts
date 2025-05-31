@@ -26,4 +26,7 @@ export * from './seasonalPrice'
 export * from './profiles'
 
 // Reservation türleri (yeni eklenen)
-export * from './reservation' 
+export * from './reservation'
+
+// Villa SEO türleri
+export * from './villaSEO' 
