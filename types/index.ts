@@ -16,6 +16,9 @@ export * from './villaAmenity'
 // Villa Tag türleri
 export * from './villatag'
 
+// Villa-Tag ilişki türleri
+export * from './villa_tag'
+
 // Calendar Event türleri
 export * from './calendarEvent'
 

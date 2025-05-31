@@ -32,6 +32,7 @@ import { VillaStatus, type VillaCreate } from "@/types/villa"
 import { villaService } from "../../_components/villa-data-service"
 import { createClient } from "@/lib/supabase/client"
 import { VillaTag } from "@/types/villatag"
+import { NewVillaTagRelation } from "@/types/villa_tag"
 
 // Form şeması - optional ve default tanımlarını çıkar
 const villaFormSchema = z.object({
@@ -195,18 +196,27 @@ export function VillaForm({ regions }: VillaFormProps) {
     try {
       setIsSubmitting(true)
       
-      const result = await villaService.createVilla(data as VillaCreate)
+      const { tags, ...villaData } = data;
+      const result = await villaService.createVilla(villaData as VillaCreate)
       
-      // Seçilen etiketleri kaydet
-      if (result.id && data.tags.length > 0) {
+      // Seçilen etiketleri Villa_Tag junction tablosuna kaydet
+      if (result.id && tags.length > 0) {
         const supabase = createClient()
         
-        // Her bir etiket için villaId ile bağlantı kur
-        for (const tagId of data.tags) {
-          await supabase
-            .from('VillaTag')
-            .update({ villaId: result.id })
-            .eq('id', tagId)
+        // Her bir tag için Villa_Tag tablosuna kayıt ekle
+        const villaTagInserts: NewVillaTagRelation[] = tags.map(tagId => ({
+          villaId: result.id,
+          tagId: tagId
+        }))
+        
+        const { error: villaTagError } = await supabase
+          .from('Villa_Tag')
+          .insert(villaTagInserts)
+        
+        if (villaTagError) {
+          console.error('Villa tag kaydetme hatası:', villaTagError)
+          toast.error('Etiketler kaydedilirken hata oluştu')
+          return
         }
       }
       

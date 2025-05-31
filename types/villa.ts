@@ -27,7 +27,6 @@ export interface Villa {
   checkOutTime: string;
   minimumStay: number;
   rules: string[];
-  tags: string[];
   embedCode: string | null;
   status: VillaStatus;
   isPromoted: boolean;
@@ -73,7 +72,6 @@ export interface VillaFilters {
   minGuests?: number;
   maxGuests?: number;
   minStay?: number;
-  tags?: string[];
   status?: VillaStatus;
   isPromoted?: boolean;
 } 

@@ -78,9 +78,8 @@ export const villaService = {
       query = query.gte("minimumStay", filters.minStay)
     }
 
-    if (filters.tags && filters.tags.length > 0) {
-      query = query.contains("tags", filters.tags)
-    }
+    // Tag filtreleme artık Villa_Tag junction tablosu üzerinden yapılıyor
+    // Tag filtreleme için getVillasByTags() fonksiyonunu kullanın
 
     if (filters.status) {
       query = query.eq("status", filters.status)
@@ -295,18 +294,125 @@ export const villaService = {
   },
 
   /**
+   * Tag'lere göre villaları listeler
+   * @param tagIds Tag ID'leri
+   * @returns Tag'li villa listesi
+   */
+  async getVillasByTags(tagIds: string[]): Promise<Villa[]> {
+    if (!tagIds || tagIds.length === 0) {
+      return await this.listVillas();
+    }
+
+    // Villa_Tag junction tablosu üzerinden tag'e sahip villa ID'lerini al
+    const { data: villaTagData, error: villaTagError } = await supabase
+      .from("Villa_Tag")
+      .select("villaId")
+      .in("tagId", tagIds);
+
+    if (villaTagError) {
+      console.error("Villa tag ilişkileri alınırken hata oluştu:", villaTagError);
+      throw new Error(villaTagError.message);
+    }
+
+    if (!villaTagData || villaTagData.length === 0) {
+      return [];
+    }
+
+    // Benzersiz villa ID'lerini al
+    const villaIds = [...new Set(villaTagData.map(item => item.villaId))];
+
+    // Villa'ları getir
+    const { data, error } = await supabase
+      .from("Villa")
+      .select("*")
+      .in("id", villaIds)
+      .order("createdAt", { ascending: false });
+
+    if (error) {
+      console.error("Tag'li villalar alınırken hata oluştu:", error);
+      throw new Error(error.message);
+    }
+
+    return data as Villa[];
+  },
+
+  /**
    * Villa etiket ilişkilerini temizler
    * @param villaId Villa ID
    * @returns Başarılı mı?
    */
   async clearVillaTags(villaId: string): Promise<boolean> {
     const { error } = await supabase
-      .from("VillaTag")
-      .update({ villaId: null })
+      .from("Villa_Tag")
+      .delete()
       .eq("villaId", villaId);
 
     if (error) {
       console.error("Villa etiketleri temizlenirken hata oluştu:", error);
+      throw new Error(error.message);
+    }
+
+    return true;
+  },
+
+  /**
+   * Bir villa'nın tag'lerini getirir
+   * @param villaId Villa ID
+   * @returns Villa'nın tag'leri
+   */
+  async getVillaTags(villaId: string): Promise<Array<{id: string, name: string}>> {
+    // İki ayrı sorgu ile tag'leri al (tip güvenliği için)
+    const { data: villaTagData, error: villaTagError } = await supabase
+      .from("Villa_Tag")
+      .select("tagId")
+      .eq("villaId", villaId);
+
+    if (villaTagError) {
+      console.error("Villa tag ilişkileri alınırken hata oluştu:", villaTagError);
+      throw new Error(villaTagError.message);
+    }
+
+    if (!villaTagData || villaTagData.length === 0) {
+      return [];
+    }
+
+    const tagIds = villaTagData.map(item => item.tagId);
+
+    const { data: tagData, error: tagError } = await supabase
+      .from("VillaTag")
+      .select("id, name")
+      .in("id", tagIds);
+
+    if (tagError) {
+      console.error("Tag'ler alınırken hata oluştu:", tagError);
+      throw new Error(tagError.message);
+    }
+
+    return tagData || [];
+  },
+
+  /**
+   * Villa'ya tag'ler ekler
+   * @param villaId Villa ID
+   * @param tagIds Tag ID'leri
+   * @returns Başarılı mı?
+   */
+  async addVillaTags(villaId: string, tagIds: string[]): Promise<boolean> {
+    if (!tagIds || tagIds.length === 0) {
+      return true;
+    }
+
+    const villaTagInserts = tagIds.map(tagId => ({
+      villaId,
+      tagId
+    }));
+
+    const { error } = await supabase
+      .from("Villa_Tag")
+      .insert(villaTagInserts);
+
+    if (error) {
+      console.error("Villa tag'leri eklenirken hata oluştu:", error);
       throw new Error(error.message);
     }
 

@@ -84,7 +84,6 @@ export interface Database {
           checkOutTime: string
           minimumStay: number
           rules: string[]
-          tags: string[]
           embedCode: string | null
           status: "ACTIVE" | "INACTIVE"
           isPromoted: boolean
@@ -114,7 +113,6 @@ export interface Database {
           checkOutTime?: string
           minimumStay?: number
           rules: string[]
-          tags: string[]
           embedCode?: string | null
           status?: "ACTIVE" | "INACTIVE"
           isPromoted?: boolean
@@ -144,7 +142,6 @@ export interface Database {
           checkOutTime?: string
           minimumStay?: number
           rules?: string[]
-          tags?: string[]
           embedCode?: string | null
           status?: "ACTIVE" | "INACTIVE"
           isPromoted?: boolean
@@ -213,25 +210,46 @@ export interface Database {
       VillaTag: {
         Row: {
           id: string
-          villaId: string | null
           name: string
           createdAt: string
         }
         Insert: {
           id?: string
-          villaId?: string | null
           name: string
           createdAt?: string
         }
         Update: {
           id?: string
-          villaId?: string | null
           name?: string
+          createdAt?: string
+        }
+        Relationships: []
+      },
+      Villa_Tag: {
+        Row: {
+          villaId: string
+          tagId: string
+          createdAt: string
+        }
+        Insert: {
+          villaId: string
+          tagId: string
+          createdAt?: string
+        }
+        Update: {
+          villaId?: string
+          tagId?: string
           createdAt?: string
         }
         Relationships: [
           {
-            foreignKeyName: "villatag_villaid_fkey"
+            foreignKeyName: "villa_tag_tagid_fkey"
+            columns: ["tagId"]
+            referencedRelation: "VillaTag"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "villa_tag_villaid_fkey"
             columns: ["villaId"]
             referencedRelation: "Villa"
             referencedColumns: ["id"]

@@ -32,6 +32,7 @@ import { Villa, VillaStatus, type VillaUpdate } from "@/types/villa"
 import { villaService } from "@/app/(dashboard)/admin/villas/_components/villa-data-service"
 import { createClient } from "@/lib/supabase/client"
 import { VillaTag } from "@/types/villatag"
+import { NewVillaTagRelation } from "@/types/villa_tag"
 
 // Form şeması - optional ve default tanımlarını çıkar
 const villaFormSchema = z.object({
@@ -136,26 +137,7 @@ export function VillaForm({ regions, villa }: VillaFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedMainRegion, setSelectedMainRegion] = useState<string | null>(villa?.regionId || null)
   const [availableTags, setAvailableTags] = useState<VillaTag[]>([])
-
-  // Etiketleri yükle
-  useEffect(() => {
-    const loadTags = async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('VillaTag')
-        .select('*')
-        .order('name')
-      
-      if (error) {
-        console.error("Etiketler yüklenirken hata oluştu:", error)
-        return
-      }
-      
-      setAvailableTags(data as VillaTag[])
-    }
-    
-    loadTags()
-  }, [])
+  const [currentVillaTags, setCurrentVillaTags] = useState<string[]>([])
 
   // Ana bölgeler ve alt bölgeler
   const mainRegions = regions.filter(r => r.isMainRegion)
@@ -185,7 +167,7 @@ export function VillaForm({ regions, villa }: VillaFormProps) {
       checkOutTime: villa.checkOutTime,
       minimumStay: villa.minimumStay,
       rules: villa.rules ?? [],
-      tags: villa.tags ?? [],
+      tags: [], // Başlangıçta boş, sonra useEffect'te güncellenecek
       embedCode: villa.embedCode,
       status: villa.status,
       isPromoted: villa.isPromoted,
@@ -195,6 +177,51 @@ export function VillaForm({ regions, villa }: VillaFormProps) {
       cancellationNotes: villa.cancellationNotes,
     } : defaultValues,
   })
+
+  // Etiketleri ve mevcut villa etiketlerini yükle
+  useEffect(() => {
+    const loadTagsAndCurrentTags = async () => {
+      const supabase = createClient()
+      
+      // Tüm mevcut etiketleri yükle
+      const { data: tagsData, error: tagsError } = await supabase
+        .from('VillaTag')
+        .select('*')
+        .order('name')
+      
+      if (tagsError) {
+        console.error("Etiketler yüklenirken hata oluştu:", tagsError)
+        return
+      }
+      
+      setAvailableTags(tagsData as VillaTag[])
+      
+      // Eğer villa ID'si varsa, mevcut villa etiketlerini yükle
+      if (villa?.id) {
+        const { data: villaTagsData, error: villaTagsError } = await supabase
+          .from('Villa_Tag')
+          .select('tagId')
+          .eq('villaId', villa.id)
+        
+        if (villaTagsError) {
+          console.error("Villa etiketleri yüklenirken hata oluştu:", villaTagsError)
+          return
+        }
+        
+        const tagIds = villaTagsData?.map(relation => relation.tagId) || []
+        setCurrentVillaTags(tagIds)
+      }
+    }
+    
+    loadTagsAndCurrentTags()
+  }, [villa?.id])
+  
+  // Villa etiketleri yüklendiğinde form'u güncelle
+  useEffect(() => {
+    if (currentVillaTags.length >= 0) {
+      form.setValue('tags', currentVillaTags)
+    }
+  }, [currentVillaTags, form])
 
   // Ana bölge değiştiğinde alt bölge alanını sıfırla
   const handleMainRegionChange = (regionId: string) => {
@@ -228,21 +255,41 @@ export function VillaForm({ regions, villa }: VillaFormProps) {
       }
       
       // Villayı güncelle
-      const result = await villaService.updateVilla(villa.id, data as VillaUpdate);
+      const { tags, ...villaData } = data;
+      const result = await villaService.updateVilla(villa.id, villaData as VillaUpdate);
       
-      // Seçilen etiketleri güncelle
-      if (result.id && data.tags) {
+      // Villa etiketlerini güncelle - Villa_Tag junction tablosunu kullan
+      if (result.id) {
         const supabase = createClient()
         
-        // Önce mevcut etiket ilişkilerini temizle
-        await villaService.clearVillaTags(result.id);
+        // Önce mevcut villa-tag ilişkilerini temizle
+        const { error: deleteError } = await supabase
+          .from('Villa_Tag')
+          .delete()
+          .eq('villaId', result.id)
         
-        // Sonra yeni etiket ilişkilerini oluştur
-        for (const tagId of data.tags) {
-          await supabase
-            .from('VillaTag')
-            .update({ villaId: result.id })
-            .eq('id', tagId)
+        if (deleteError) {
+          console.error('Mevcut etiketler silinirken hata oluştu:', deleteError)
+          toast.error('Etiketler güncellenirken hata oluştu')
+          return
+        }
+        
+        // Yeni etiket ilişkilerini ekle
+        if (tags && tags.length > 0) {
+          const villaTagInserts: NewVillaTagRelation[] = tags.map(tagId => ({
+            villaId: result.id,
+            tagId: tagId
+          }))
+          
+          const { error: insertError } = await supabase
+            .from('Villa_Tag')
+            .insert(villaTagInserts)
+          
+          if (insertError) {
+            console.error('Yeni etiketler eklenirken hata oluştu:', insertError)
+            toast.error('Etiketler güncellenirken hata oluştu')
+            return
+          }
         }
       }
       

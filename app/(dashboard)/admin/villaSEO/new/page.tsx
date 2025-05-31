@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { VillaSEOForm } from '../_components/VillaSEOForm'
 import { useVillaSEO } from '../_components/useVillaSEO'
+import AIContentComponent from './_components/aicontent'
 import type { VillaSEOFormData } from '@/types'
 
 export default function NewVillaSEOPage() {
@@ -35,7 +36,7 @@ export default function NewVillaSEOPage() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="flex items-center gap-4 mb-8">
             <Button
@@ -55,11 +56,41 @@ export default function NewVillaSEOPage() {
             </div>
           </div>
 
-          {/* Form - Card wrapper kaldırıldı */}
-          <VillaSEOForm
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-          />
+          {/* Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* AI Content Section */}
+            <div className="order-2 lg:order-1">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    AI İçerik Yardımcısı
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Villa seçerek SEO içerikleri için AI prompt&apos;ı oluşturun
+                  </p>
+                </div>
+                <AIContentComponent />
+              </div>
+            </div>
+
+            {/* SEO Form Section */}
+            <div className="order-1 lg:order-2">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    SEO Bilgileri
+                  </h2>
+                  <p className="text-gray-600 text-sm">
+                    Villa SEO ayarlarını yapılandırın
+                  </p>
+                </div>
+                <VillaSEOForm
+                  onSubmit={handleSubmit}
+                  onCancel={handleCancel}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
