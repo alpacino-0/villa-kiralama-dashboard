@@ -32,4 +32,7 @@ export * from './profiles'
 export * from './reservation'
 
 // Villa SEO türleri
-export * from './villaSEO' 
+export * from './villaSEO'
+
+// Customer related types
+export * from './customer' 

@@ -488,6 +488,52 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      },
+      Customer: {
+        Row: {
+          id: string
+          fullname: string
+          email: string
+          phone: string | null
+          identityNumber: string | null
+          interestedVillaId: string | null
+          note: string | null
+          status: Database["public"]["Enums"]["CustomerStatus"]
+          createdAt: string | null
+          updatedAt: string | null
+        }
+        Insert: {
+          id?: string
+          fullname: string
+          email: string
+          phone?: string | null
+          identityNumber?: string | null
+          interestedVillaId?: string | null
+          note?: string | null
+          status?: Database["public"]["Enums"]["CustomerStatus"]
+          createdAt?: string | null
+          updatedAt?: string | null
+        }
+        Update: {
+          id?: string
+          fullname?: string
+          email?: string
+          phone?: string | null
+          identityNumber?: string | null
+          interestedVillaId?: string | null
+          note?: string | null
+          status?: Database["public"]["Enums"]["CustomerStatus"]
+          createdAt?: string | null
+          updatedAt?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "Customer_interestedVillaId_fkey"
+            columns: ["interestedVillaId"]
+            referencedRelation: "Villa"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       // Diğer tablolarınızı buraya ekleyebilirsiniz
     },
@@ -496,7 +542,8 @@ export interface Database {
       CalendarStatus: "AVAILABLE" | "PENDING" | "RESERVED" | "BLOCKED",
       EventType: "CHECKIN" | "CHECKOUT" | "SPECIAL_OFFER",
       PaymentType: "FULL_PAYMENT" | "SPLIT_PAYMENT",
-      ReservationStatus: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED"
+      ReservationStatus: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED",
+      CustomerStatus: "NEW" | "CONTACTED" | "INTERESTED" | "BOOKED" | "CLOSED" | "LOST"
     }
   }
 } 

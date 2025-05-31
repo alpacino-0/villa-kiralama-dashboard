@@ -2,21 +2,20 @@
 
 import * as React from "react"
 import {
-  IconCamera,
-  IconChartBar,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
   IconFileDescription,
-  IconFileWord,
+  IconFileInvoice,
   IconHelp,
   IconHome,
-  IconReport,
   IconSearch,
   IconSettings,
   IconMap,
   IconTags,
   IconSeo,
+  IconUsers,
+  IconStar,
+  IconFileText,
+  IconClipboardList,
 } from "@tabler/icons-react"
 import Image from "next/image"
 
@@ -34,7 +33,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/use-auth"
-import Link from "next/link"
 
 const data = {
   navMain: [
@@ -51,7 +49,17 @@ const data = {
     {
       title: "Rezervasyon Yönetimi",
       url: "/admin/reservations",
-      icon: IconChartBar,
+      icon: IconClipboardList,
+    },
+    {
+      title: "Müşteri Yönetimi",
+      url: "/admin/customers",
+      icon: IconUsers,
+    },
+    {
+      title: "İnceleme & Yorumlar",
+      url: "/admin/reviews",
+      icon: IconStar,
     },
     {
       title: "Villa SEO",
@@ -69,86 +77,38 @@ const data = {
       icon: IconMap,
     },
   ],
-  navClouds: [
-    {
-      title: "Yakala",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Aktif Teklifler",
-          url: "#",
-        },
-        {
-          title: "Arşivlenmiş",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Teklif",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Aktif Teklifler",
-          url: "#",
-        },
-        {
-          title: "Arşivlenmiş",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "İstemler",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Aktif Teklifler",
-          url: "#",
-        },
-        {
-          title: "Arşivlenmiş",
-          url: "#",
-        },
-      ],
-    },
-  ],
   navSecondary: [
     {
       title: "Ayarlar",
-      url: "#",
+      url: "/admin/settings",
       icon: IconSettings,
     },
     {
       title: "Yardım Al",
-      url: "#",
+      url: "/admin/help",
       icon: IconHelp,
     },
     {
       title: "Arama",
-      url: "#",
+      url: "/admin/search",
       icon: IconSearch,
     },
   ],
   documents: [
     {
-      name: "Veri Kütüphanesi",
-      url: "#",
-      icon: IconDatabase,
+      name: "Sözleşmeler",
+      url: "/admin/contracts",
+      icon: IconFileText,
     },
     {
-      name: "Raporlar",
-      url: "#",
-      icon: IconReport,
+      name: "Belgeler",
+      url: "/admin/documents",
+      icon: IconFileDescription,
     },
     {
-      name: "Kelime Asistanı",
-      url: "#",
-      icon: IconFileWord,
+      name: "Faturalar",
+      url: "/admin/invoices",
+      icon: IconFileInvoice,
     },
   ],
 }
@@ -166,20 +126,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <Link href="/">
-                <Image 
-                  src="/icon.svg" 
-                  alt="Inn Elegance Logo" 
-                  width={20} 
-                  height={20} 
-                  className="size-5"
-                />
-                <span className="text-base font-semibold">Inn Elegance</span>
-              </Link>
+            <SidebarMenuButton className="data-[slot=sidebar-menu-button]:!p-1.5">
+              <Image 
+                src="/icon.svg" 
+                alt="Inn Elegance Logo" 
+                width={20} 
+                height={20} 
+                className="size-5"
+              />
+              <span className="text-base font-semibold">Inn Elegance</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
